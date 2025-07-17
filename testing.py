@@ -30,6 +30,8 @@ names = [
     # 'downloads/TOK10d1/20250717T00/precip-total_TOK10d1_bra_20250717T00_20250718T12.nc',
     # 'downloads/TOK10d1/20250717T00/ws10m-inst_TOK10d1_bra_20250717T00_20250726T18.nc',
     # 'downloads/TOK10d1/20250717T00/wd10m-inst_TOK10d1_bra_20250717T00_20250726T18.nc'
+
+    'downloads/TOKMDcp/20250717T00/precip-extreme_TOKMDcp_bra_20250717T00_20250717T00_hourly.nc'
 ]
 
 if __name__ == "__main__":
