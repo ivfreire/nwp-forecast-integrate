@@ -18,10 +18,10 @@ class ECENS(Base):
     @staticmethod
     def preprocess_dataset(ds: xr.Dataset) -> xr.Dataset:
         ecm0_ds = ds.sel(number=0)
-        ecm0_ds.coords['model_id'] = 'ECENSm00'
+        ecm0_ds.coords['model_id'] = ds.model_id.name + 'm00'
 
         ecav_df = ds.mean(dim='number')
-        ecav_df.coords['model_id'] = 'ECENSav'
+        ecav_df.coords['model_id'] = ds.model_id.name + 'av'
 
         ds = xr.concat([ecm0_ds, ecav_df], dim='model_id')
         ds.coords['times'] = ds.time + ds.step

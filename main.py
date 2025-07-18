@@ -11,7 +11,6 @@ app = FastAPI()
 
 @app.get("/process")
 async def process_data(request: Request):
-    data = await request.json()
-    return {"message": "Data processed successfully", "data": data}
+    return Shard.process(await request.json())
 
 # =========================================================================== #

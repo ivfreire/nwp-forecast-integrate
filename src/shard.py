@@ -1,4 +1,5 @@
 
+import os
 import re
 
 import pandas as pd
@@ -7,6 +8,11 @@ from src.gcp.connector import engine
 from src import forecast
 
 # =========================================================================== #
+
+ALLOWED_MODELS = os.getenv('ALLOWED_MODELS').split(',')
+ALLOWED_VARIABLES = os.getenv('ALLOWED_VARIABLES').split(',')
+
+# --------------------------------------------------------------------------- #
 
 pattern = re.compile(
     r"downloads/"
@@ -20,7 +26,7 @@ pattern = re.compile(
     r"(?P<extension>\w+)"
 )
 
-# =========================================================================== #
+# --------------------------------------------------------------------------- #
 
 class Shard:
 
@@ -41,6 +47,18 @@ class Shard:
 # --------------------------------------------------------------------------- #
 
     @staticmethod
+    def is_shard_valid(attributes: dict):
+        '''Checks if the shard is valid for processing. Should return true.'''
+        allowed_models = set(ALLOWED_MODELS) & set(forecast.MODEL_PROCESSOR_MAPPING.keys())
+        
+        return (
+            (attributes['model'] in list(allowed_models))
+            and (attributes['variable'] in ALLOWED_VARIABLES)
+        )
+
+# --------------------------------------------------------------------------- #
+
+    @staticmethod
     def fetch_points():
         return pd.read_csv(
             'gs://tok-power-config/sample-point-partition-forecast.csv',
@@ -51,15 +69,25 @@ class Shard:
 
     @staticmethod
     def process(data: dict):
-        attributes = Shard.parse_attributes(data)
+        try:
+            attributes = Shard.parse_attributes(data)
 
-        PROCESSOR = forecast.MODEL_PROCESSOR_MAPPING[attributes['model']]
+            if not Shard.is_shard_valid(attributes):
+                print(f'Skipping invalid shard {data["name"]}.')
+                return 0
 
-        points_df = Shard.fetch_points()
+            PROCESSOR = forecast.MODEL_PROCESSOR_MAPPING[attributes['model']]
 
-        processor = PROCESSOR(**attributes)
-        processor.ingest_points(points_df)
+            points_df = Shard.fetch_points()
 
-        print(f'Processed {len(points_df)} points for {attributes["model"]} model.')
+            processor = PROCESSOR(**attributes)
+            processor.ingest_points(points_df)
+
+            print(f'Processed {len(points_df)} points for {attributes["model"]} model.')
+            return 0
+
+        except Exception as ex:
+            print(f'Error processing shard {data["name"]}: {ex}')
+            return 1
 
 # =========================================================================== #
