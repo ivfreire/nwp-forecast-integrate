@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from src.model.model import Model
+from src.forecast.base import Base
 
 # =========================================================================== #
 
@@ -25,7 +25,7 @@ FIELDS_MAPPING = {
 
 # --------------------------------------------------------------------------- #
 
-class TOK(Model):
+class TOK(Base):
 
 # --------------------------------------------------------------------------- #
 

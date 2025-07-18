@@ -4,7 +4,7 @@ import re
 import pandas as pd
 
 from src.gcp.connector import engine
-from src import model
+from src import forecast
 
 # =========================================================================== #
 
@@ -22,7 +22,7 @@ pattern = re.compile(
 
 # =========================================================================== #
 
-class Controller:
+class Shard:
 
 # --------------------------------------------------------------------------- #
 
@@ -67,11 +67,11 @@ class Controller:
 
     @staticmethod
     def process(data: dict):
-        attributes = Controller.parse_attributes(data)
+        attributes = Shard.parse_attributes(data)
 
-        PROCESSOR = model.MODEL_PROCESSOR_MAPPING[attributes['model']]
+        PROCESSOR = forecast.MODEL_PROCESSOR_MAPPING[attributes['model']]
 
-        points_df = Controller.fetch_points()
+        points_df = Shard.fetch_points()
 
         processor = PROCESSOR(**attributes)
         processor.ingest_points(points_df)

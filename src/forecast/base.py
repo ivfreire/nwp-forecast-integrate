@@ -12,7 +12,7 @@ TABLE_MAPPING = {'wind': 'tokwsv3.generation.wind_forecast_subpark_hourly_v2'}
 TABLE_COLUMNS = ['updated', 'date', 'times', 'group_id', 'subpark_id', 'model',
                  'variable', 'value']
 
-class Model:
+class Base:
 
 # --------------------------------------------------------------------------- #
 
@@ -90,6 +90,19 @@ class Model:
 
 # --------------------------------------------------------------------------- #
 
+    @staticmethod
+    def aggregate_points(result_df: pd.DataFrame):
+        return result_df.rename(columns={'value': 'values'}) \
+            .groupby(
+                by=['tech', 'group_id', 'subpark_id', 'model', 'variable']
+            ).apply(
+                lambda df: pd.Series({
+                    'forecast': df[['times', 'values']].to_dict(orient='records')
+                })
+            ).reset_index()
+
+# --------------------------------------------------------------------------- #
+
     def ingest_points(self, points_df: pd.DataFrame):
         ds = self.open_dataset(self.uri)
         ds = self.preprocess_dataset(ds)
@@ -98,6 +111,7 @@ class Model:
             points_df = self.filter_points_in(ds, points_df)
 
         result_df = self.extract_points(ds, points_df)
+        result_df = self.aggregate_points(result_df)
 
         result_df['date'] = self.round_dt
         result_df['updated'] = pd.Timestamp.utcnow()

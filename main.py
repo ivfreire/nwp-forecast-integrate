@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, Request
 
-from src.controller import Controller
+from src.shard import Shard
 
 # =========================================================================== #
 

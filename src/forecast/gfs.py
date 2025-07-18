@@ -2,7 +2,7 @@
 import pandas as pd
 import xarray as xr
 
-from src.model.model import Model
+from src.forecast.base import Base
 
 # =========================================================================== #
 
@@ -13,7 +13,7 @@ FIELDS_MAPPING = {
 
 # --------------------------------------------------------------------------- #
 
-class GFS(Model):
+class GFS(Base):
 
 # --------------------------------------------------------------------------- #
 
