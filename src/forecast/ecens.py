@@ -18,12 +18,12 @@ class ECENS(Base):
     @staticmethod
     def preprocess_dataset(ds: xr.Dataset) -> xr.Dataset:
         ecm0_ds = ds.sel(number=0)
-        ecm0_ds.coords['model'] = 'ECENSm00'
+        ecm0_ds.coords['model_id'] = 'ECENSm00'
 
         ecav_df = ds.mean(dim='number')
-        ecav_df.coords['model'] = 'ECENSav'
+        ecav_df.coords['model_id'] = 'ECENSav'
 
-        ds = xr.concat([ecm0_ds, ecav_df], dim='model')
+        ds = xr.concat([ecm0_ds, ecav_df], dim='model_id')
         ds.coords['times'] = ds.time + ds.step
 
         return ds
@@ -36,8 +36,9 @@ class ECENS(Base):
         
         point_df = point_ds.to_dataframe().reset_index()
         point_df = point_df.melt(
-            id_vars=['model', 'times'],
-            value_vars=ds.data_vars
+            id_vars=['model_id', 'times'],
+            value_vars=ds.data_vars,
+            var_name='variable_id',
         )
 
         return point_df

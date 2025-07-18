@@ -60,8 +60,9 @@ class TOK(Base):
 
         point_df = point_ds.to_dataframe().reset_index()
         point_df = point_df.melt(
-            id_vars=['model', 'times'],
-            value_vars=ds.data_vars
+            id_vars=['model_id', 'times'],
+            value_vars=ds.data_vars,
+            var_name='variable_id',
         )
 
         point_df['times'] = pd.to_datetime(point_df['times'].astype(str),

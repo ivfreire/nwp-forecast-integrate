@@ -26,7 +26,7 @@ class GFS(Base):
     def preprocess_dataset(ds: xr.Dataset) -> xr.Dataset:
         ds = ds.expand_dims({"dummy": [0]})
 
-        ds.coords['model'] = 'GFS'
+        ds.coords['model_id'] = 'GFS'
         ds.coords['times'] = ds.time + ds.step
 
         ds = ds.rename_vars({
@@ -46,8 +46,9 @@ class GFS(Base):
         
         point_df = point_ds.to_dataframe().reset_index()
         point_df = point_df.melt(
-            id_vars=['model', 'times'],
-            value_vars=ds.data_vars
+            id_vars=['model_id', 'times'],
+            value_vars=ds.data_vars,
+            var_name='variable_id',
         )
 
         return point_df

@@ -42,25 +42,9 @@ class Shard:
 
     @staticmethod
     def fetch_points():
-        return pd.read_sql(
-            sql='''
-                SELECT
-                    t.name AS tech,
-                    s.group_id,
-                    s.subpark_id,
-                    s.lat,
-                    s.lon
-                FROM subpark s
-                JOIN technology_customer_relation tcr ON
-                    tcr.group_id = s.group_id
-                    AND tcr.tech_id = s.tech_id
-                JOIN technology t ON
-                    t.tech_id = s.tech_id
-                WHERE
-                    t.name = 'wind'
-                    AND tcr.active
-            ''',
-            con=engine
+        return pd.read_csv(
+            'gs://tok-power-config/sample-point-partition-forecast.csv',
+            dtype={'point_id': str, 'lat': float, 'lon': float}
         )
 
 # --------------------------------------------------------------------------- #
